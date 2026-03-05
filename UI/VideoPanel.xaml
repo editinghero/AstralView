@@ -6,8 +6,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackPanel x:Name="VideoOptions" x:FieldModifier="public" Spacing="12">
-        <TextBlock Text="Video" Style="{StaticResource SubtitleTextBlockStyle}" />
+    <ContentControl x:Name="VideoOptions" x:FieldModifier="public">
+        <StackPanel Spacing="12">
+            <TextBlock Text="Video" Style="{StaticResource SubtitleTextBlockStyle}" />
 
         <StackPanel Spacing="4">
             <TextBlock Text="Max Resolution" />
@@ -39,14 +40,15 @@
             </ComboBox>
         </StackPanel>
 
-        <StackPanel Spacing="4">
-            <TextBlock Text="Codec" />
-            <ComboBox x:Name="CodecCombo" HorizontalAlignment="Stretch"
-                      SelectionChanged="CodecCombo_SelectionChanged">
-                <ComboBoxItem Content="H.264" Tag="H264" IsSelected="True"/>
-                <ComboBoxItem Content="H.265" Tag="H265"/>
-                <ComboBoxItem Content="AV1" Tag="AV1"/>
-            </ComboBox>
+            <StackPanel Spacing="4">
+                <TextBlock Text="Codec" />
+                <ComboBox x:Name="CodecCombo" HorizontalAlignment="Stretch"
+                          SelectionChanged="CodecCombo_SelectionChanged">
+                    <ComboBoxItem Content="H.264" Tag="H264" IsSelected="True"/>
+                    <ComboBoxItem Content="H.265" Tag="H265"/>
+                    <ComboBoxItem Content="AV1" Tag="AV1"/>
+                </ComboBox>
+            </StackPanel>
         </StackPanel>
-    </StackPanel>
+    </ContentControl>
 </UserControl>
