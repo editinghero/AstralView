@@ -45,6 +45,11 @@ public sealed partial class DevicePanel : UserControl
         RefreshButton.IsEnabled = true;
     }
 
+    public void RefreshDevices()
+    {
+        _ = RefreshDevicesAsync();
+    }
+
     private void RefreshButton_Click(object sender, RoutedEventArgs e)
     {
         _ = RefreshDevicesAsync();

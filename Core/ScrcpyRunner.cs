@@ -36,5 +36,34 @@ namespace AstralView.Core
                 _process?.Kill();
             }
         }
+
+        public void ForceStop()
+        {
+            if (_process != null)
+            {
+                try
+                {
+                    _process.Kill(true); // Kill entire process tree
+                    _process.WaitForExit(2000);
+                }
+                catch { }
+                finally
+                {
+                    _process?.Dispose();
+                    _process = null;
+                }
+            }
+            
+            // Also kill any orphaned scrcpy processes
+            try
+            {
+                foreach (var proc in Process.GetProcessesByName("scrcpy"))
+                {
+                    proc.Kill(true);
+                    proc.Dispose();
+                }
+            }
+            catch { }
+        }
     }
 }

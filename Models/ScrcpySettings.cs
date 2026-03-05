@@ -23,6 +23,7 @@ namespace AstralView.Models
         public CameraFacing CameraFacing { get; set; } = CameraFacing.Back;
         public string CameraSize { get; set; } = string.Empty;
         public string CameraId { get; set; } = string.Empty;
+        public bool TurnScreenOff { get; set; } = false;
 
         // Audio
         public AudioSource AudioSource { get; set; } = AudioSource.Output;

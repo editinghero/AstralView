@@ -8,7 +8,7 @@
 
     <StackPanel Spacing="12">
         <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="🎤 Audio" Style="{StaticResource SubtitleTextBlockStyle}" />
+            <TextBlock Text="Audio" Style="{StaticResource SubtitleTextBlockStyle}" />
             <ToggleSwitch x:Name="AudioToggle" Grid.Column="1"
                           IsOn="True"
                           Toggled="AudioToggle_Toggled"

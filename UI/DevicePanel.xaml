@@ -7,7 +7,7 @@
     mc:Ignorable="d">
 
     <StackPanel Spacing="8">
-        <TextBlock Text="📱 Device" Style="{StaticResource SubtitleTextBlockStyle}" />
+        <TextBlock Text="Device" Style="{StaticResource SubtitleTextBlockStyle}" />
 
         <Grid ColumnDefinitions="*,Auto,Auto">
             <ComboBox x:Name="DeviceComboBox"

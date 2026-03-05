@@ -6,8 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackPanel Spacing="12">
-        <TextBlock Text="🎬 Video" Style="{StaticResource SubtitleTextBlockStyle}" />
+    <StackPanel x:Name="VideoOptions" Spacing="12">
+        <TextBlock Text="Video" Style="{StaticResource SubtitleTextBlockStyle}" />
 
         <StackPanel Spacing="4">
             <TextBlock Text="Max Resolution" />

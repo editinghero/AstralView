@@ -8,13 +8,12 @@
 
     <StackPanel Spacing="12">
         <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="📷 Camera" Style="{StaticResource SubtitleTextBlockStyle}" />
+            <TextBlock Text="Camera" Style="{StaticResource SubtitleTextBlockStyle}" />
             <ToggleSwitch x:Name="CameraToggle" Grid.Column="1"
                           Toggled="CameraToggle_Toggled"
                           OnContent="" OffContent="" />
         </Grid>
 
-        <!-- Using individual IsEnabled bindings or a Control container -->
         <StackPanel x:Name="CameraOptions" Spacing="10" Opacity="0.5">
             <StackPanel Spacing="4">
                 <TextBlock Text="Facing" />
@@ -43,6 +42,8 @@
                          IsEnabled="False"
                          TextChanged="CameraIdBox_TextChanged" />
             </StackPanel>
+            
+            <CheckBox x:Name="TurnScreenOffCheck" Content="Turn screen off" IsEnabled="False" />
         </StackPanel>
     </StackPanel>
 </UserControl>
