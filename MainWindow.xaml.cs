@@ -3,9 +3,11 @@ using AstralView.Models;
 using AstralView.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Windowing;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Pickers;
 
@@ -14,6 +16,10 @@ namespace AstralView;
 public sealed partial class MainWindow : Window
 {
     private sealed record ShortcutItem(string Action, string Shortcut);
+
+    private readonly TimeSpan _restartDebounce = TimeSpan.FromMilliseconds(500);
+    private CancellationTokenSource? _restartCts;
+    private bool _restartInProgress;
 
     private readonly ScrcpyRunner _runner;
     private readonly WirelessManager _wirelessManager;
@@ -35,6 +41,8 @@ public sealed partial class MainWindow : Window
         
         Title = "AstralView";
 
+        TrySetWindowIcon();
+
         _adb = new AdbService(ScrcpyPaths.AdbPath);
         _runner = new ScrcpyRunner(ScrcpyPaths.ScrcpyPath);
         _wirelessManager = new WirelessManager(_adb);
@@ -49,6 +57,12 @@ public sealed partial class MainWindow : Window
         // Listen to camera toggle to disable video
         CameraPanelControl.CameraToggleSwitch.Toggled += (s, e) =>
         {
+            if (CameraPanelControl.CameraEnabled)
+            {
+                // Default to audio off for camera (user can enable it)
+                AudioPanelControl.SetAudioEnabled(false);
+            }
+
             VideoPanelControl.VideoOptions.IsEnabled = !CameraPanelControl.CameraEnabled;
             VideoPanelControl.VideoOptions.Opacity = CameraPanelControl.CameraEnabled ? 0.5 : 1.0;
             UpdateCommandPreview();
@@ -59,60 +73,131 @@ public sealed partial class MainWindow : Window
 
     private void WireCommandPreviewEvents()
     {
-        FullscreenCheck.Checked += (_, _) => UpdateCommandPreview();
-        FullscreenCheck.Unchecked += (_, _) => UpdateCommandPreview();
-        AlwaysOnTopCheck.Checked += (_, _) => UpdateCommandPreview();
-        AlwaysOnTopCheck.Unchecked += (_, _) => UpdateCommandPreview();
+        FullscreenCheck.Checked += (_, _) => OnSettingsChanged();
+        FullscreenCheck.Unchecked += (_, _) => OnSettingsChanged();
+        AlwaysOnTopCheck.Checked += (_, _) => OnSettingsChanged();
+        AlwaysOnTopCheck.Unchecked += (_, _) => OnSettingsChanged();
 
-        RecordToggle.Toggled += (_, _) => UpdateCommandPreview();
-        RecordFileBox.TextChanged += (_, _) => UpdateCommandPreview();
+        RecordToggle.Toggled += (_, _) => OnSettingsChanged();
+        RecordFileBox.TextChanged += (_, _) => OnSettingsChanged();
 
         IpAddressBox.TextChanged += (_, _) => { };
         PortBox.TextChanged += (_, _) => { };
 
-        AudioPanelControl.SettingsChanged += (_, _) => UpdateCommandPreview();
-        VideoPanelControl.SettingsChanged += (_, _) => UpdateCommandPreview();
-        CameraPanelControl.SettingsChanged += (_, _) => UpdateCommandPreview();
+        AudioPanelControl.SettingsChanged += (_, _) => OnSettingsChanged();
+        VideoPanelControl.SettingsChanged += (_, _) => OnSettingsChanged();
+        CameraPanelControl.SettingsChanged += (_, _) => OnSettingsChanged();
+    }
+
+    private void OnSettingsChanged()
+    {
+        UpdateCommandPreview();
+
+        if (!_runner.IsRunning) return;
+        _ = RestartScrcpyDebouncedAsync();
+    }
+
+    private async Task RestartScrcpyDebouncedAsync()
+    {
+        if (_restartInProgress) return;
+
+        _restartCts?.Cancel();
+        _restartCts?.Dispose();
+        _restartCts = new CancellationTokenSource();
+        var token = _restartCts.Token;
+
+        try
+        {
+            await Task.Delay(_restartDebounce, token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        await RestartScrcpyAsync();
+    }
+
+    private async Task RestartScrcpyAsync()
+    {
+        if (_restartInProgress) return;
+        _restartInProgress = true;
+
+        try
+        {
+            var args = CommandPreviewText.Text.Replace("scrcpy ", "").Trim();
+            _runner.ForceStop();
+            await Task.Delay(300);
+            _runner.Start(args);
+            StatusBarText.Text = "scrcpy restarted";
+        }
+        catch (Exception ex)
+        {
+            StatusBarText.Text = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            _restartInProgress = false;
+        }
     }
 
     private static ShortcutItem[] GetDefaultShortcuts() => new[]
     {
-        new ShortcutItem("Switch fullscreen mode", "MOD+f"),
-        new ShortcutItem("Rotate display left", "MOD+←"),
-        new ShortcutItem("Rotate display right", "MOD+→"),
-        new ShortcutItem("Flip display horizontally", "MOD+Shift+← | MOD+Shift+→"),
-        new ShortcutItem("Flip display vertically", "MOD+Shift+↑ | MOD+Shift+↓"),
-        new ShortcutItem("Pause or re-pause display", "MOD+z"),
-        new ShortcutItem("Unpause display", "MOD+Shift+z"),
-        new ShortcutItem("Reset video capture/encoding", "MOD+Shift+r"),
-        new ShortcutItem("Resize window to 1:1 (pixel-perfect)", "MOD+g"),
-        new ShortcutItem("Resize window to remove black borders", "MOD+w | Double-left-click"),
-        new ShortcutItem("Click on HOME", "MOD+h | Middle-click"),
-        new ShortcutItem("Click on BACK", "MOD+b | MOD+Backspace | Right-click"),
-        new ShortcutItem("Click on APP_SWITCH", "MOD+s | 4th-click"),
-        new ShortcutItem("Click on MENU (unlock screen)", "MOD+m"),
-        new ShortcutItem("Click on VOLUME_UP", "MOD+↑"),
-        new ShortcutItem("Click on VOLUME_DOWN", "MOD+↓"),
-        new ShortcutItem("Click on POWER", "MOD+p"),
+        new ShortcutItem("Switch fullscreen mode", "Left Alt+f"),
+        new ShortcutItem("Rotate display left", "Left Alt+←"),
+        new ShortcutItem("Rotate display right", "Left Alt+→"),
+        new ShortcutItem("Flip display horizontally", "Left Alt+Shift+← | Left Alt+Shift+→"),
+        new ShortcutItem("Flip display vertically", "Left Alt+Shift+↑ | Left Alt+Shift+↓"),
+        new ShortcutItem("Pause or re-pause display", "Left Alt+z"),
+        new ShortcutItem("Unpause display", "Left Alt+Shift+z"),
+        new ShortcutItem("Reset video capture/encoding", "Left Alt+Shift+r"),
+        new ShortcutItem("Resize window to 1:1 (pixel-perfect)", "Left Alt+g"),
+        new ShortcutItem("Resize window to remove black borders", "Left Alt+w | Double-left-click"),
+        new ShortcutItem("Click on HOME", "Left Alt+h | Middle-click"),
+        new ShortcutItem("Click on BACK", "Left Alt+b | Left Alt+Backspace | Right-click"),
+        new ShortcutItem("Click on APP_SWITCH", "Left Alt+s | 4th-click"),
+        new ShortcutItem("Click on MENU (unlock screen)", "Left Alt+m"),
+        new ShortcutItem("Click on VOLUME_UP", "Left Alt+↑"),
+        new ShortcutItem("Click on VOLUME_DOWN", "Left Alt+↓"),
+        new ShortcutItem("Click on POWER", "Left Alt+p"),
         new ShortcutItem("Power on", "Right-click"),
-        new ShortcutItem("Turn device screen off (keep mirroring)", "MOD+o"),
-        new ShortcutItem("Turn device screen on", "MOD+Shift+o"),
-        new ShortcutItem("Rotate device screen", "MOD+r"),
-        new ShortcutItem("Expand notification panel", "MOD+n | 5th-click"),
-        new ShortcutItem("Expand settings panel", "MOD+n+n | Double-5th-click"),
-        new ShortcutItem("Collapse panels", "MOD+Shift+n"),
-        new ShortcutItem("Copy to clipboard", "MOD+c"),
-        new ShortcutItem("Cut to clipboard", "MOD+x"),
-        new ShortcutItem("Synchronize clipboards and paste", "MOD+v"),
-        new ShortcutItem("Inject computer clipboard text", "MOD+Shift+v"),
-        new ShortcutItem("Open keyboard settings (HID keyboard only)", "MOD+k"),
-        new ShortcutItem("Enable/disable FPS counter (on stdout)", "MOD+i"),
+        new ShortcutItem("Turn device screen off (keep mirroring)", "Left Alt+o"),
+        new ShortcutItem("Turn device screen on", "Left Alt+Shift+o"),
+        new ShortcutItem("Rotate device screen", "Left Alt+r"),
+        new ShortcutItem("Expand notification panel", "Left Alt+n | 5th-click"),
+        new ShortcutItem("Expand settings panel", "Left Alt+n+n | Double-5th-click"),
+        new ShortcutItem("Collapse panels", "Left Alt+Shift+n"),
+        new ShortcutItem("Copy to clipboard", "Left Alt+c"),
+        new ShortcutItem("Cut to clipboard", "Left Alt+x"),
+        new ShortcutItem("Synchronize clipboards and paste", "Left Alt+v"),
+        new ShortcutItem("Inject computer clipboard text", "Left Alt+Shift+v"),
+        new ShortcutItem("Open keyboard settings (HID keyboard only)", "Left Alt+k"),
+        new ShortcutItem("Enable/disable FPS counter (on stdout)", "Left Alt+i"),
         new ShortcutItem("Pinch-to-zoom/rotate", "Ctrl + click-and-move"),
         new ShortcutItem("Tilt vertically (slide with 2 fingers)", "Shift + click-and-move"),
         new ShortcutItem("Tilt horizontally (slide with 2 fingers)", "Ctrl+Shift + click-and-move"),
         new ShortcutItem("Drag & drop APK file", "Install APK from computer"),
         new ShortcutItem("Drag & drop non-APK file", "Push file to device"),
     };
+
+    private void TrySetWindowIcon()
+    {
+        try
+        {
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
+            var appWindow = AppWindow.GetFromWindowId(windowId);
+            var iconPath = Path.Combine(AppContext.BaseDirectory, "icon", "favicon.ico");
+            if (File.Exists(iconPath))
+            {
+                appWindow.SetIcon(iconPath);
+            }
+        }
+        catch
+        {
+            // ignore
+        }
+    }
 
     private void UpdateCommandPreview()
     {
@@ -144,12 +229,15 @@ public sealed partial class MainWindow : Window
         };
     }
 
-    private void StartButton_Click(object sender, RoutedEventArgs e)
+    private async void StartButton_Click(object sender, RoutedEventArgs e)
     {
         var args = CommandPreviewText.Text.Replace("scrcpy ", "").Trim();
 
         try
         {
+            // Ensure any previous instance is gone to avoid camera relaunch issues
+            _runner.ForceStop();
+            await Task.Delay(200);
             _runner.Start(args);
             StatusBarText.Text = "scrcpy started";
             StartButton.IsEnabled = false;
@@ -163,6 +251,7 @@ public sealed partial class MainWindow : Window
 
     private void StopButton_Click(object sender, RoutedEventArgs e)
     {
+        StatusBarText.Text = "Stopping...";
         _runner.ForceStop();
         StatusBarText.Text = "Stopped";
         StartButton.IsEnabled = true;

@@ -10,9 +10,17 @@ public sealed partial class AudioPanel : UserControl
 
     public event EventHandler? SettingsChanged;
 
+    public bool AudioEnabled => AudioToggle?.IsOn == true;
+
     public AudioPanel()
     {
         this.InitializeComponent();
+    }
+
+    public void SetAudioEnabled(bool enabled)
+    {
+        if (AudioToggle == null) return;
+        AudioToggle.IsOn = enabled;
     }
 
     private void AudioToggle_Toggled(object sender, RoutedEventArgs e)

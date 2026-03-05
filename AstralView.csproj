@@ -28,6 +28,6 @@
 
   <ItemGroup>
     <None Include="app.manifest" />
-    <None Include="icon\favicon.ico" />
+    <None Include="icon\favicon.ico" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

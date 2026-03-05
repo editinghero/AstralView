@@ -44,7 +44,7 @@ namespace AstralView.Core
                 try
                 {
                     _process.Kill(true); // Kill entire process tree
-                    _process.WaitForExit(2000);
+                    _process.WaitForExit(500);
                 }
                 catch { }
                 finally
