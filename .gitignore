@@ -15,8 +15,3 @@ bin/
 # OS
 Thumbs.db
 .DS_Store
-
-# Tools (binaries should be downloaded separately)
-Tools/scrcpy.exe
-Tools/adb.exe
-Tools/scrcpy-server.jar
