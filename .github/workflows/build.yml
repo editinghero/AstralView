@@ -23,11 +23,11 @@ jobs:
         run: dotnet restore
 
       - name: Build (x64 Release)
-        run: dotnet build --configuration Release -v n -p:Platform=x64 -p:RuntimeIdentifier=win-x64 --no-self-contained
+        run: msbuild AstralView.csproj /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:RestorePackages=false
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: AstralView-win-x64
-          path: bin/Release/net8.0-windows10.0.19041.0/win-x64/
+          path: bin/x64/Release/net8.0-windows10.0.26100.0/win-x64/
           if-no-files-found: warn
