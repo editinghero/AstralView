@@ -2,7 +2,7 @@ using AstralView.Models;
 using Microsoft.UI.Xaml.Controls;
 using System;
 
-namespace AstralView;
+namespace AstralView.UI;
 
 public sealed partial class VideoPanel : UserControl
 {

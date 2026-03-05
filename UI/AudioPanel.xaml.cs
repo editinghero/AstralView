@@ -2,7 +2,7 @@ using AstralView.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace AstralView;
+namespace AstralView.UI;
 
 public sealed partial class AudioPanel : UserControl
 {

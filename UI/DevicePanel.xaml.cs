@@ -3,9 +3,9 @@ using AstralView.Models;
 using AstralView.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System.Threading.Tasks; // CRITICAL FIX: Missing namespace
+using System.Threading.Tasks;
 
-namespace AstralView;
+namespace AstralView.UI; // Namespace matches folder
 
 public sealed partial class DevicePanel : UserControl
 {

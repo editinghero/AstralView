@@ -2,7 +2,7 @@
     x:Class="AstralView.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:AstralView"
+    xmlns:ui="using:AstralView.UI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -29,22 +29,22 @@
                         <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,10" />
 
                         <!-- Device Panel -->
-                        <local:DevicePanel x:Name="DevicePanelControl" />
+                        <ui:DevicePanel x:Name="DevicePanelControl" />
 
                         <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,10" />
 
                         <!-- Video Panel -->
-                        <local:VideoPanel x:Name="VideoPanelControl" />
+                        <ui:VideoPanel x:Name="VideoPanelControl" />
 
                         <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,10" />
 
                         <!-- Camera Panel -->
-                        <local:CameraPanel x:Name="CameraPanelControl" />
+                        <ui:CameraPanel x:Name="CameraPanelControl" />
 
                         <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,10" />
 
                         <!-- Audio Panel -->
-                        <local:AudioPanel x:Name="AudioPanelControl" />
+                        <ui:AudioPanel x:Name="AudioPanelControl" />
 
                         <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,10" />
 
