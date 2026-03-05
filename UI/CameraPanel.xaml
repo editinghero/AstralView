@@ -14,10 +14,12 @@
                           OnContent="" OffContent="" />
         </Grid>
 
-        <StackPanel x:Name="CameraOptions" IsEnabled="False" Spacing="10">
+        <!-- Using individual IsEnabled bindings or a Control container -->
+        <StackPanel x:Name="CameraOptions" Spacing="10" Opacity="0.5">
             <StackPanel Spacing="4">
                 <TextBlock Text="Facing" />
                 <ComboBox x:Name="FacingCombo" HorizontalAlignment="Stretch"
+                          IsEnabled="False"
                           SelectionChanged="FacingCombo_SelectionChanged">
                     <ComboBoxItem Content="Back" IsSelected="True"/>
                     <ComboBoxItem Content="Front"/>
@@ -27,6 +29,7 @@
             <StackPanel Spacing="4">
                 <TextBlock Text="Camera Size" />
                 <ComboBox x:Name="CameraSizeCombo" HorizontalAlignment="Stretch"
+                          IsEnabled="False"
                           SelectionChanged="CameraSizeCombo_SelectionChanged">
                     <ComboBoxItem Content="1920x1080" IsSelected="True"/>
                     <ComboBoxItem Content="1280x720"/>
@@ -37,6 +40,7 @@
             <StackPanel Spacing="4">
                 <TextBlock Text="Camera ID (optional)" />
                 <TextBox x:Name="CameraIdBox" PlaceholderText="e.g. 0"
+                         IsEnabled="False"
                          TextChanged="CameraIdBox_TextChanged" />
             </StackPanel>
         </StackPanel>
