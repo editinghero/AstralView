@@ -108,7 +108,7 @@ public sealed partial class MainWindow : Window
         }
 
         WirelessStatusText.Text = "Connecting...";
-        var result = await _wirelessManager.ConnectAsync(ip, serial); // Note: adb connect logic
+        var result = await _wirelessManager.ConnectAsync(serial, ip); // Fixed argument order: serial first, then ip
         WirelessStatusText.Text = result.Trim();
     }
 

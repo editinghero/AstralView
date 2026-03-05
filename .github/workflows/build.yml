@@ -23,7 +23,7 @@ jobs:
         run: dotnet restore
 
       - name: Build (x64 Release)
-        run: dotnet build --configuration Release -r win-x64 --no-self-contained
+        run: dotnet build --configuration Release -v n -p:Platform=x64 -p:RuntimeIdentifier=win-x64 --no-self-contained
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4

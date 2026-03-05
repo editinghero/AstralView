@@ -1,4 +1,5 @@
 using AstralView.Models;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace AstralView;
@@ -12,7 +13,7 @@ public sealed partial class AudioPanel : UserControl
         this.InitializeComponent();
     }
 
-    private void AudioToggle_Toggled(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void AudioToggle_Toggled(object sender, RoutedEventArgs e)
     {
         AudioOptions.IsEnabled = AudioToggle.IsOn;
         if (!AudioToggle.IsOn)

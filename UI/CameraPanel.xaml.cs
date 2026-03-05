@@ -1,4 +1,5 @@
 using AstralView.Models;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace AstralView;
@@ -15,7 +16,7 @@ public sealed partial class CameraPanel : UserControl
         this.InitializeComponent();
     }
 
-    private void CameraToggle_Toggled(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void CameraToggle_Toggled(object sender, RoutedEventArgs e)
     {
         CameraEnabled = CameraToggle.IsOn;
         CameraOptions.IsEnabled = CameraEnabled;

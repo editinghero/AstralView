@@ -7,8 +7,6 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <!-- Add standard WinUI 3 typography just in case -->
-                <ResourceDictionary Source="ms-appx:///Microsoft.WindowsAppSDK/themes/common/generic.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
