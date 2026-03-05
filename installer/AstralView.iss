@@ -24,7 +24,7 @@ SolidCompression=yes
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 UninstallDisplayIcon={app}\{#MyAppExeName}
-SetupIconFile={#SourcePath}\..\icon\favicon.ico
+SetupIconFile={#SourcePath}\..\icon\512x512.ico
 WizardStyle=modern
 
 [Languages]

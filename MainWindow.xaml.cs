@@ -219,7 +219,7 @@ public sealed partial class MainWindow : Window
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
             var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
             var appWindow = AppWindow.GetFromWindowId(windowId);
-            var iconPath = Path.Combine(AppContext.BaseDirectory, "icon", "favicon.ico");
+            var iconPath = Path.Combine(AppContext.BaseDirectory, "icon", "512x512.ico");
             if (File.Exists(iconPath))
             {
                 appWindow.SetIcon(iconPath);

@@ -4,7 +4,7 @@
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>AstralView</RootNamespace>
-    <ApplicationIcon>icon\favicon.ico</ApplicationIcon>
+    <ApplicationIcon>icon\512x512.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <UseWinUI>true</UseWinUI>
     <Platforms>x64</Platforms>
@@ -28,6 +28,6 @@
 
   <ItemGroup>
     <None Include="app.manifest" />
-    <None Include="icon\favicon.ico" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="icon\512x512.ico" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
