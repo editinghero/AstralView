@@ -8,6 +8,14 @@ namespace AstralView.Services
     {
         private readonly string _adbPath;
 
+        private static string NormalizeAddress(string address)
+        {
+            address = address.Trim();
+            if (string.IsNullOrEmpty(address)) return address;
+
+            return address.Contains(':') ? address : $"{address}:5555";
+        }
+
         public AdbService(string adbPath)
         {
             _adbPath = adbPath;
@@ -35,19 +43,22 @@ namespace AstralView.Services
             return devices;
         }
 
-        public async Task EnableTcpIpAsync(string serial)
+        public async Task EnableTcpIpAsync(string serial, int port = 5555)
         {
-            await RunCommandAsync($"-s {serial} tcpip 5555");
+            if (port <= 0) port = 5555;
+            await RunCommandAsync($"-s {serial} tcpip {port}");
         }
 
-        public async Task<string> ConnectAsync(string ip)
+        public async Task<string> ConnectAsync(string address)
         {
-            return await RunCommandAsync($"connect {ip}:5555");
+            address = NormalizeAddress(address);
+            return await RunCommandAsync($"connect {address}");
         }
 
-        public async Task<string> DisconnectAsync(string ip)
+        public async Task<string> DisconnectAsync(string address)
         {
-            return await RunCommandAsync($"disconnect {ip}:5555");
+            address = NormalizeAddress(address);
+            return await RunCommandAsync($"disconnect {address}");
         }
 
         public async Task<string> ExecuteCommandAsync(string args)

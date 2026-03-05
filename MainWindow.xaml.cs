@@ -13,6 +13,8 @@ namespace AstralView;
 
 public sealed partial class MainWindow : Window
 {
+    private sealed record ShortcutItem(string Action, string Shortcut);
+
     private readonly ScrcpyRunner _runner;
     private readonly WirelessManager _wirelessManager;
     private readonly AdbService _adb;
@@ -39,6 +41,10 @@ public sealed partial class MainWindow : Window
         _deviceManager = new DeviceManager(_adb);
 
         DevicePanelControl.Initialize(_adb, _deviceManager);
+
+        ShortcutsListView.ItemsSource = GetDefaultShortcuts();
+
+        WireCommandPreviewEvents();
         
         // Listen to camera toggle to disable video
         CameraPanelControl.CameraToggleSwitch.Toggled += (s, e) =>
@@ -50,6 +56,77 @@ public sealed partial class MainWindow : Window
         
         UpdateCommandPreview();
     }
+
+    private void WireCommandPreviewEvents()
+    {
+        FullscreenCheck.Checked += (_, _) => UpdateCommandPreview();
+        FullscreenCheck.Unchecked += (_, _) => UpdateCommandPreview();
+        AlwaysOnTopCheck.Checked += (_, _) => UpdateCommandPreview();
+        AlwaysOnTopCheck.Unchecked += (_, _) => UpdateCommandPreview();
+
+        RecordToggle.Toggled += (_, _) => UpdateCommandPreview();
+        RecordFileBox.TextChanged += (_, _) => UpdateCommandPreview();
+
+        IpAddressBox.TextChanged += (_, _) => { };
+        PortBox.TextChanged += (_, _) => { };
+
+        AudioPanelControl.Loaded += (_, _) =>
+        {
+            AudioPanelControl.FindName("AudioToggle");
+            UpdateCommandPreview();
+        };
+
+        AudioPanelControl.AddHandler(ToggleSwitch.ToggledEvent, new RoutedEventHandler((_, _) => UpdateCommandPreview()), true);
+        AudioPanelControl.AddHandler(ComboBox.SelectionChangedEvent, new SelectionChangedEventHandler((_, _) => UpdateCommandPreview()), true);
+
+        VideoPanelControl.AddHandler(ComboBox.SelectionChangedEvent, new SelectionChangedEventHandler((_, _) => UpdateCommandPreview()), true);
+        VideoPanelControl.AddHandler(Slider.ValueChangedEvent, new Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventHandler((_, _) => UpdateCommandPreview()), true);
+
+        CameraPanelControl.AddHandler(ToggleSwitch.ToggledEvent, new RoutedEventHandler((_, _) => UpdateCommandPreview()), true);
+        CameraPanelControl.AddHandler(ComboBox.SelectionChangedEvent, new SelectionChangedEventHandler((_, _) => UpdateCommandPreview()), true);
+        CameraPanelControl.AddHandler(TextBox.TextChangedEvent, new TextChangedEventHandler((_, _) => UpdateCommandPreview()), true);
+        CameraPanelControl.AddHandler(CheckBox.CheckedEvent, new RoutedEventHandler((_, _) => UpdateCommandPreview()), true);
+        CameraPanelControl.AddHandler(CheckBox.UncheckedEvent, new RoutedEventHandler((_, _) => UpdateCommandPreview()), true);
+    }
+
+    private static ShortcutItem[] GetDefaultShortcuts() => new[]
+    {
+        new ShortcutItem("Switch fullscreen mode", "MOD+f"),
+        new ShortcutItem("Rotate display left", "MOD+←"),
+        new ShortcutItem("Rotate display right", "MOD+→"),
+        new ShortcutItem("Flip display horizontally", "MOD+Shift+← | MOD+Shift+→"),
+        new ShortcutItem("Flip display vertically", "MOD+Shift+↑ | MOD+Shift+↓"),
+        new ShortcutItem("Pause or re-pause display", "MOD+z"),
+        new ShortcutItem("Unpause display", "MOD+Shift+z"),
+        new ShortcutItem("Reset video capture/encoding", "MOD+Shift+r"),
+        new ShortcutItem("Resize window to 1:1 (pixel-perfect)", "MOD+g"),
+        new ShortcutItem("Resize window to remove black borders", "MOD+w | Double-left-click"),
+        new ShortcutItem("Click on HOME", "MOD+h | Middle-click"),
+        new ShortcutItem("Click on BACK", "MOD+b | MOD+Backspace | Right-click"),
+        new ShortcutItem("Click on APP_SWITCH", "MOD+s | 4th-click"),
+        new ShortcutItem("Click on MENU (unlock screen)", "MOD+m"),
+        new ShortcutItem("Click on VOLUME_UP", "MOD+↑"),
+        new ShortcutItem("Click on VOLUME_DOWN", "MOD+↓"),
+        new ShortcutItem("Click on POWER", "MOD+p"),
+        new ShortcutItem("Power on", "Right-click"),
+        new ShortcutItem("Turn device screen off (keep mirroring)", "MOD+o"),
+        new ShortcutItem("Turn device screen on", "MOD+Shift+o"),
+        new ShortcutItem("Rotate device screen", "MOD+r"),
+        new ShortcutItem("Expand notification panel", "MOD+n | 5th-click"),
+        new ShortcutItem("Expand settings panel", "MOD+n+n | Double-5th-click"),
+        new ShortcutItem("Collapse panels", "MOD+Shift+n"),
+        new ShortcutItem("Copy to clipboard", "MOD+c"),
+        new ShortcutItem("Cut to clipboard", "MOD+x"),
+        new ShortcutItem("Synchronize clipboards and paste", "MOD+v"),
+        new ShortcutItem("Inject computer clipboard text", "MOD+Shift+v"),
+        new ShortcutItem("Open keyboard settings (HID keyboard only)", "MOD+k"),
+        new ShortcutItem("Enable/disable FPS counter (on stdout)", "MOD+i"),
+        new ShortcutItem("Pinch-to-zoom/rotate", "Ctrl + click-and-move"),
+        new ShortcutItem("Tilt vertically (slide with 2 fingers)", "Shift + click-and-move"),
+        new ShortcutItem("Tilt horizontally (slide with 2 fingers)", "Ctrl+Shift + click-and-move"),
+        new ShortcutItem("Drag & drop APK file", "Install APK from computer"),
+        new ShortcutItem("Drag & drop non-APK file", "Push file to device"),
+    };
 
     private void UpdateCommandPreview()
     {
@@ -114,10 +191,12 @@ public sealed partial class MainWindow : Window
         
         if (string.IsNullOrEmpty(ip)) return;
 
-        var address = string.IsNullOrEmpty(port) ? ip : $"{ip}:{port}";
+        int parsedPort = 5555;
+        if (!string.IsNullOrEmpty(port) && int.TryParse(port, out var p) && p > 0) parsedPort = p;
+        var address = string.IsNullOrEmpty(port) ? ip : $"{ip}:{parsedPort}";
         
         WirelessStatusText.Text = "Connecting...";
-        var result = await _wirelessManager.ConnectAsync(serial, address);
+        var result = await _wirelessManager.ConnectAsync(serial, address, parsedPort);
         WirelessStatusText.Text = result.Trim();
         
         await Task.Delay(1000);
@@ -130,8 +209,10 @@ public sealed partial class MainWindow : Window
         var port = PortBox.Text.Trim();
         
         if (string.IsNullOrEmpty(ip)) return;
-        
-        var address = string.IsNullOrEmpty(port) ? ip : $"{ip}:{port}";
+
+        int parsedPort = 5555;
+        if (!string.IsNullOrEmpty(port) && int.TryParse(port, out var p) && p > 0) parsedPort = p;
+        var address = string.IsNullOrEmpty(port) ? ip : $"{ip}:{parsedPort}";
         var result = await _wirelessManager.DisconnectAsync(address);
         WirelessStatusText.Text = result.Trim();
         
