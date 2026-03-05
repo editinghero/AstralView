@@ -70,23 +70,9 @@ public sealed partial class MainWindow : Window
         IpAddressBox.TextChanged += (_, _) => { };
         PortBox.TextChanged += (_, _) => { };
 
-        AudioPanelControl.Loaded += (_, _) =>
-        {
-            AudioPanelControl.FindName("AudioToggle");
-            UpdateCommandPreview();
-        };
-
-        AudioPanelControl.AddHandler(ToggleSwitch.ToggledEvent, new RoutedEventHandler((_, _) => UpdateCommandPreview()), true);
-        AudioPanelControl.AddHandler(ComboBox.SelectionChangedEvent, new SelectionChangedEventHandler((_, _) => UpdateCommandPreview()), true);
-
-        VideoPanelControl.AddHandler(ComboBox.SelectionChangedEvent, new SelectionChangedEventHandler((_, _) => UpdateCommandPreview()), true);
-        VideoPanelControl.AddHandler(Slider.ValueChangedEvent, new Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventHandler((_, _) => UpdateCommandPreview()), true);
-
-        CameraPanelControl.AddHandler(ToggleSwitch.ToggledEvent, new RoutedEventHandler((_, _) => UpdateCommandPreview()), true);
-        CameraPanelControl.AddHandler(ComboBox.SelectionChangedEvent, new SelectionChangedEventHandler((_, _) => UpdateCommandPreview()), true);
-        CameraPanelControl.AddHandler(TextBox.TextChangedEvent, new TextChangedEventHandler((_, _) => UpdateCommandPreview()), true);
-        CameraPanelControl.AddHandler(CheckBox.CheckedEvent, new RoutedEventHandler((_, _) => UpdateCommandPreview()), true);
-        CameraPanelControl.AddHandler(CheckBox.UncheckedEvent, new RoutedEventHandler((_, _) => UpdateCommandPreview()), true);
+        AudioPanelControl.SettingsChanged += (_, _) => UpdateCommandPreview();
+        VideoPanelControl.SettingsChanged += (_, _) => UpdateCommandPreview();
+        CameraPanelControl.SettingsChanged += (_, _) => UpdateCommandPreview();
     }
 
     private static ShortcutItem[] GetDefaultShortcuts() => new[]

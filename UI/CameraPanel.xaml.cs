@@ -14,6 +14,8 @@ public sealed partial class CameraPanel : UserControl
     
     public ToggleSwitch CameraToggleSwitch => CameraToggle;
 
+    public event EventHandler? SettingsChanged;
+
     public CameraPanel()
     {
         this.InitializeComponent();
@@ -28,21 +30,41 @@ public sealed partial class CameraPanel : UserControl
         CameraIdBox.IsEnabled = CameraEnabled;
         TurnScreenOffCheck.IsEnabled = CameraEnabled;
         CameraOptions.Opacity = CameraEnabled ? 1.0 : 0.5;
+
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void FacingCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         Facing = FacingCombo.SelectedIndex == 1 ? CameraFacing.Front : CameraFacing.Back;
+
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void CameraSizeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (CameraSizeCombo.SelectedItem is ComboBoxItem item)
             CameraSize = item.Content?.ToString() ?? "1920x1080";
+
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void CameraIdBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         CameraId = CameraIdBox.Text;
+
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void TurnScreenOffCheck_Checked(object sender, RoutedEventArgs e)
+    {
+        TurnScreenOff = true;
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void TurnScreenOffCheck_Unchecked(object sender, RoutedEventArgs e)
+    {
+        TurnScreenOff = false;
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 }

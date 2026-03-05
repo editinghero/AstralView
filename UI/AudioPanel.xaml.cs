@@ -8,6 +8,8 @@ public sealed partial class AudioPanel : UserControl
 {
     public AudioSource SelectedAudioSource { get; private set; } = AudioSource.Output;
 
+    public event EventHandler? SettingsChanged;
+
     public AudioPanel()
     {
         this.InitializeComponent();
@@ -27,11 +29,14 @@ public sealed partial class AudioPanel : UserControl
             SelectedAudioSource = AudioSource.None;
         else
             UpdateAudioSource();
+
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void AudioSourceCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         UpdateAudioSource();
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void UpdateAudioSource()

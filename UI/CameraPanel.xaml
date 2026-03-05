@@ -43,7 +43,9 @@
                          TextChanged="CameraIdBox_TextChanged" />
             </StackPanel>
             
-            <CheckBox x:Name="TurnScreenOffCheck" Content="Turn screen off" IsEnabled="False" />
+            <CheckBox x:Name="TurnScreenOffCheck" Content="Turn screen off" IsEnabled="False"
+                     Checked="TurnScreenOffCheck_Checked"
+                     Unchecked="TurnScreenOffCheck_Unchecked" />
         </StackPanel>
     </StackPanel>
 </UserControl>

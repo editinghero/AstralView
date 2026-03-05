@@ -10,6 +10,8 @@ public sealed partial class VideoPanel : UserControl
     public int MaxFps { get; private set; } = 60;
     public VideoCodec Codec { get; private set; } = VideoCodec.H264;
 
+    public event EventHandler? SettingsChanged;
+
     public VideoPanel()
     {
         this.InitializeComponent();
@@ -27,12 +29,16 @@ public sealed partial class VideoPanel : UserControl
             if (int.TryParse(item.Tag?.ToString(), out var result))
                 MaxSize = result;
         }
+
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void BitrateSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
     {
         BitRate = (int)e.NewValue;
         if (BitrateLabel != null) BitrateLabel.Text = $"{BitRate} Mbps";
+
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void FpsCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -42,6 +48,8 @@ public sealed partial class VideoPanel : UserControl
             if (int.TryParse(item.Tag?.ToString(), out var result))
                 MaxFps = result;
         }
+
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void CodecCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -51,5 +59,7 @@ public sealed partial class VideoPanel : UserControl
             if (Enum.TryParse<VideoCodec>(item.Tag?.ToString(), out var result))
                 Codec = result;
         }
+
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 }
