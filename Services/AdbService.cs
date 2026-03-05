@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using AstralView.Models;
+using System.IO;
 
 namespace AstralView.Services
 {
@@ -70,13 +71,19 @@ namespace AstralView.Services
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(_adbPath) || !File.Exists(_adbPath))
+                {
+                    return "ADB error: adb.exe not found";
+                }
+
                 var startInfo = new ProcessStartInfo
                 {
                     FileName = _adbPath,
                     Arguments = args,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = true,
+                    WorkingDirectory = Path.GetDirectoryName(_adbPath) ?? AppContext.BaseDirectory
                 };
 
                 using var process = Process.Start(startInfo);

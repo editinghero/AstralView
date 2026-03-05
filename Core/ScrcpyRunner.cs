@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 
 namespace AstralView.Core
 {
@@ -20,12 +21,18 @@ namespace AstralView.Core
         {
             if (IsRunning) return;
 
+            if (string.IsNullOrWhiteSpace(_scrcpyPath) || !File.Exists(_scrcpyPath))
+            {
+                throw new FileNotFoundException("scrcpy.exe not found", _scrcpyPath);
+            }
+
             var startInfo = new ProcessStartInfo
             {
                 FileName = _scrcpyPath,
                 Arguments = arguments,
                 UseShellExecute = false,
-                CreateNoWindow = true
+                CreateNoWindow = true,
+                WorkingDirectory = Path.GetDirectoryName(_scrcpyPath) ?? AppContext.BaseDirectory
             };
 
             _process = Process.Start(startInfo);
