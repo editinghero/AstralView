@@ -53,6 +53,8 @@ namespace AstralView.Core
                 sb.Append("--no-audio ");
             else if (_settings.AudioSource == AudioSource.Mic) 
                 sb.Append("--audio-source=mic ");
+            else if (_settings.AudioSource == AudioSource.Output)
+                sb.Append("--audio-source=output ");
 
             if (_settings.Fullscreen) sb.Append("--fullscreen ");
             if (_settings.AlwaysOnTop) sb.Append("--always-on-top ");

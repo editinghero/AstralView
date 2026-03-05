@@ -44,6 +44,7 @@ public sealed partial class MainWindow : Window
         Title = "AstralView";
 
         TrySetWindowIcon();
+        TrySetTitleBarToMatchBackground();
 
         _adb = new AdbService(ScrcpyPaths.AdbPath);
         _runner = new ScrcpyRunner(ScrcpyPaths.ScrcpyPath);
@@ -101,6 +102,11 @@ public sealed partial class MainWindow : Window
 
     private void OnSettingsChanged()
     {
+        if (string.IsNullOrWhiteSpace(CommandPreviewText.Text))
+        {
+            _customCommandActive = false;
+        }
+
         UpdateCommandPreview();
 
         if (!_runner.IsRunning) return;
@@ -110,6 +116,12 @@ public sealed partial class MainWindow : Window
     private void OnCommandPreviewEdited()
     {
         if (_isUpdatingCommandPreview) return;
+
+        if (string.IsNullOrWhiteSpace(CommandPreviewText.Text))
+        {
+            _customCommandActive = false;
+            return;
+        }
 
         _customCommandActive = true;
 
@@ -218,6 +230,26 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    private void TrySetTitleBarToMatchBackground()
+    {
+        try
+        {
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
+            var appWindow = AppWindow.GetFromWindowId(windowId);
+            var titleBar = appWindow.TitleBar;
+
+            titleBar.ExtendsContentIntoTitleBar = true;
+            titleBar.BackgroundColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
+            titleBar.InactiveBackgroundColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
+            titleBar.ButtonBackgroundColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
+            titleBar.ButtonInactiveBackgroundColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
+        }
+        catch
+        {
+        }
+    }
+
     private void UpdateCommandPreview()
     {
         if (_customCommandActive) return;
@@ -251,7 +283,7 @@ public sealed partial class MainWindow : Window
             BitRateMbps = VideoPanelControl.BitRate,
             MaxFps = VideoPanelControl.MaxFps,
             Codec = VideoPanelControl.Codec,
-            AudioSource = AudioPanelControl.SelectedAudioSource,
+            AudioSource = AudioPanelControl.AudioEnabled ? AudioPanelControl.SelectedAudioSource : AudioSource.None,
             Fullscreen = FullscreenCheck.IsChecked == true,
             AlwaysOnTop = AlwaysOnTopCheck.IsChecked == true,
             Record = RecordToggle.IsOn,
@@ -358,24 +390,6 @@ public sealed partial class MainWindow : Window
         
         await _adb.ExecuteCommandAsync($"-s {serial} shell input keyevent 26");
         StatusBarText.Text = "Screen turned on";
-    }
-
-    private async void RotateLeft_Click(object sender, RoutedEventArgs e)
-    {
-        var serial = DevicePanelControl.SelectedDevice?.Serial;
-        if (string.IsNullOrEmpty(serial)) return;
-
-        await _adb.ExecuteCommandAsync($"-s {serial} shell settings put system user_rotation 3");
-        StatusBarText.Text = "Rotated left";
-    }
-
-    private async void RotateRight_Click(object sender, RoutedEventArgs e)
-    {
-        var serial = DevicePanelControl.SelectedDevice?.Serial;
-        if (string.IsNullOrEmpty(serial)) return;
-
-        await _adb.ExecuteCommandAsync($"-s {serial} shell settings put system user_rotation 1");
-        StatusBarText.Text = "Rotated right";
     }
 
     private async void ShowTouches_Click(object sender, RoutedEventArgs e)
