@@ -25,8 +25,8 @@ jobs:
         run: dotnet restore
 
       - name: Build and Publish (Self-Contained)
-        # We specify the OutputPath clearly so we know where to find the files
-        run: msbuild AstralView.csproj /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=true /p:PublishSingleFile=false /p:WindowsPackageType=None /p:OutputPath=publish/
+        # Using msbuild to ensure WindowsAppSDKSelfContained is respected
+        run: msbuild AstralView.csproj /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=true /p:WindowsAppSDKSelfContained=true /p:WindowsPackageType=None /p:OutputPath=publish/
 
       - name: Debug - List Files
         run: dir /s publish
@@ -35,6 +35,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: AstralView-win-x64
-          # msbuild Appends the platform/config to the OutputPath, so we point to that location
           path: publish/win-x64/
           if-no-files-found: error

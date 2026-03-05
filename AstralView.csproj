@@ -11,6 +11,7 @@
     <!-- Self-contained settings for portability -->
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <PublishReadyToRun>false</PublishReadyToRun>
     
     <Nullable>enable</Nullable>
