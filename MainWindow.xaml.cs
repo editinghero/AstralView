@@ -19,7 +19,15 @@ public sealed partial class MainWindow : Window
     {
         this.InitializeComponent();
 
-        SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop();
+        try
+        {
+            SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop();
+        }
+        catch
+        {
+            // MicaBackdrop requires Windows 11, fallback to default
+        }
+        
         Title = "AstralView";
 
         _adb = new AdbService(ScrcpyPaths.AdbPath);
