@@ -2,7 +2,9 @@ name: Build AstralView
 
 on:
   push:
+    branches: [ main, master ]
   pull_request:
+    branches: [ main, master ]
 
 jobs:
   build:
@@ -16,18 +18,16 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
-
       - name: Restore NuGet packages
         run: dotnet restore
 
-      - name: Build (x64 Release)
-        run: msbuild AstralView.csproj /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:RestorePackages=false
+      - name: Publish (Self-Contained)
+        # Using 'dotnet publish' is the best way to gather all dependencies for a Self-Contained app
+        run: dotnet publish AstralView.csproj -c Release -r win-x64 --self-contained true -p:WindowsPackageType=None -o publish
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: AstralView-win-x64
-          path: bin/x64/Release/net8.0-windows10.0.26100.0/win-x64/
-          if-no-files-found: warn
+          path: publish/
+          if-no-files-found: error

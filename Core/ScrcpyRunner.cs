@@ -2,46 +2,38 @@ using System.Diagnostics;
 
 namespace AstralView.Core
 {
-    /// <summary>
-    /// Launches scrcpy.exe with the provided CLI arguments.
-    /// </summary>
     public class ScrcpyRunner
     {
+        private Process? _process;
         private readonly string _scrcpyPath;
-        private Process? _currentProcess;
 
-        public ScrcpyRunner(string scrcpyPath = "scrcpy")
+        public bool IsRunning => _process != null && !_process.HasExited;
+
+        public ScrcpyRunner(string scrcpyPath)
         {
             _scrcpyPath = scrcpyPath;
         }
 
-        public bool IsRunning => _currentProcess != null && !_currentProcess.HasExited;
-
-        /// <summary>
-        /// Starts scrcpy with the specified arguments.
-        /// </summary>
         public void Start(string arguments)
         {
             if (IsRunning) return;
 
-            var psi = new ProcessStartInfo(_scrcpyPath, arguments)
+            var startInfo = new ProcessStartInfo
             {
+                FileName = _scrcpyPath,
+                Arguments = arguments,
                 UseShellExecute = false,
-                CreateNoWindow = false
+                CreateNoWindow = true
             };
 
-            _currentProcess = Process.Start(psi);
+            _process = Process.Start(startInfo);
         }
 
-        /// <summary>
-        /// Stops the currently running scrcpy process.
-        /// </summary>
         public void Stop()
         {
-            if (_currentProcess != null && !_currentProcess.HasExited)
+            if (IsRunning)
             {
-                _currentProcess.Kill();
-                _currentProcess = null;
+                _process?.Kill();
             }
         }
     }

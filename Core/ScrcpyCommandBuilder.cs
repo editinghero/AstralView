@@ -1,11 +1,8 @@
-using AstralView.Models;
 using System.Text;
+using AstralView.Models;
 
 namespace AstralView.Core
 {
-    /// <summary>
-    /// Builds scrcpy CLI arguments from a ScrcpySettings instance.
-    /// </summary>
     public class ScrcpyCommandBuilder
     {
         private readonly ScrcpySettings _settings;
@@ -17,72 +14,35 @@ namespace AstralView.Core
 
         public string Build()
         {
-            var args = new StringBuilder();
+            var sb = new StringBuilder();
 
-            // Device selection
             if (!string.IsNullOrEmpty(_settings.DeviceSerial))
-                args.Append($"-s {_settings.DeviceSerial} ");
+                sb.Append($"--serial {_settings.DeviceSerial} ");
 
-            // Video source
+            if (_settings.MaxSize > 0)
+                sb.Append($"--max-size {_settings.MaxSize} ");
+
+            sb.Append($"--video-bit-rate {_settings.BitRateMbps}M ");
+            sb.Append($"--max-fps {_settings.MaxFps} ");
+
             if (_settings.UseCamera)
             {
-                args.Append("--video-source=camera ");
-
-                if (_settings.CameraFacing == CameraFacing.Front)
-                    args.Append("--camera-facing=front ");
-                else
-                    args.Append("--camera-facing=back ");
-
+                sb.Append("--camera-id ");
+                sb.Append(string.IsNullOrEmpty(_settings.CameraId) ? "0 " : $"{_settings.CameraId} ");
                 if (!string.IsNullOrEmpty(_settings.CameraSize))
-                    args.Append($"--camera-size={_settings.CameraSize} ");
-
-                if (!string.IsNullOrEmpty(_settings.CameraId))
-                    args.Append($"--camera-id={_settings.CameraId} ");
+                    sb.Append($"--camera-size {_settings.CameraSize} ");
             }
 
-            // Resolution
-            if (_settings.MaxSize > 0)
-                args.Append($"--max-size={_settings.MaxSize} ");
+            if (_settings.AudioSource == AudioSource.None) sb.Append("--no-audio ");
+            else if (_settings.AudioSource == AudioSource.Mic) sb.Append("--audio-source=mic ");
 
-            // Bitrate
-            args.Append($"--video-bit-rate={_settings.BitRateMbps}M ");
+            if (_settings.Fullscreen) sb.Append("--fullscreen ");
+            if (_settings.AlwaysOnTop) sb.Append("--always-on-top ");
 
-            // FPS
-            if (_settings.MaxFps > 0)
-                args.Append($"--max-fps={_settings.MaxFps} ");
+            if (_settings.Record)
+                sb.Append($"--record {_settings.RecordFile} ");
 
-            // Codec
-            args.Append($"--video-codec={_settings.Codec.ToString().ToLower()} ");
-
-            // Audio
-            switch (_settings.AudioSource)
-            {
-                case AudioSource.Output:
-                    args.Append("--audio-source=output ");
-                    break;
-                case AudioSource.Mic:
-                    args.Append("--audio-source=mic ");
-                    break;
-                case AudioSource.None:
-                    args.Append("--no-audio ");
-                    break;
-            }
-
-            // Window
-            if (_settings.Fullscreen)
-                args.Append("--fullscreen ");
-
-            if (_settings.AlwaysOnTop)
-                args.Append("--always-on-top ");
-
-            if (!string.IsNullOrEmpty(_settings.WindowTitle))
-                args.Append($"--window-title=\"{_settings.WindowTitle}\" ");
-
-            // Recording
-            if (_settings.Record && !string.IsNullOrEmpty(_settings.RecordFile))
-                args.Append($"--record={_settings.RecordFile} ");
-
-            return args.ToString().Trim();
+            return sb.ToString().Trim();
         }
     }
 }

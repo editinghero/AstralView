@@ -1,92 +1,73 @@
-using AstralView.Models;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using AstralView.Models;
 
 namespace AstralView.Services
 {
-    /// <summary>
-    /// Wraps ADB commands to list and manage Android devices.
-    /// </summary>
     public class AdbService
     {
         private readonly string _adbPath;
 
-        public AdbService(string adbPath = "adb")
+        public AdbService(string adbPath)
         {
             _adbPath = adbPath;
         }
 
-        /// <summary>
-        /// Returns a list of connected Android devices.
-        /// </summary>
         public async Task<List<Device>> GetDevicesAsync()
         {
-            var output = await RunAdbAsync("devices -l");
+            var output = await RunCommandAsync("devices -l");
             var devices = new List<Device>();
 
-            foreach (var line in output.Split('\n'))
+            var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines.Skip(1))
             {
-                if (line.StartsWith("List") || string.IsNullOrWhiteSpace(line))
-                    continue;
-
-                var parts = line.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length < 2) continue;
-
-                var device = new Device { Serial = parts[0], State = parts[1] };
-
-                // Parse "model:" token
-                foreach (var part in parts)
-                    if (part.StartsWith("model:"))
-                        device.Model = part.Replace("model:", "").Replace("_", " ");
-
-                devices.Add(device);
+                var match = Regex.Match(line, @"^([^\s]+)\s+([^\s]+).+model:([^\s]+)");
+                if (match.Success)
+                {
+                    devices.Add(new Device
+                    {
+                        Serial = match.Groups[1].Value,
+                        State = match.Groups[2].Value,
+                        Model = match.Groups[3].Value
+                    });
+                }
             }
-
             return devices;
         }
 
-        /// <summary>
-        /// Enables TCP/IP mode for wireless debugging on port 5555.
-        /// </summary>
-        public async Task<string> EnableTcpIpAsync(string serial)
+        public async Task EnableTcpIpAsync(string serial)
         {
-            return await RunAdbAsync($"-s {serial} tcpip 5555");
+            await RunCommandAsync($"-s {serial} tcpip 5555");
         }
 
-        /// <summary>
-        /// Connects to a device over WiFi.
-        /// </summary>
-        public async Task<string> ConnectAsync(string ipAddress)
+        public async Task<string> ConnectAsync(string ip)
         {
-            return await RunAdbAsync($"connect {ipAddress}:5555");
+            return await RunCommandAsync($"connect {ip}:5555");
         }
 
-        /// <summary>
-        /// Disconnects a wireless device.
-        /// </summary>
-        public async Task<string> DisconnectAsync(string ipAddress)
+        public async Task<string> DisconnectAsync(string ip)
         {
-            return await RunAdbAsync($"disconnect {ipAddress}:5555");
+            return await RunCommandAsync($"disconnect {ip}:5555");
         }
 
-        private async Task<string> RunAdbAsync(string arguments)
+        private async Task<string> RunCommandAsync(string args)
         {
-            var psi = new ProcessStartInfo(_adbPath, arguments)
+            try
             {
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = _adbPath,
+                    Arguments = args,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
 
-            using var process = Process.Start(psi)!;
-            var sb = new StringBuilder();
-            sb.Append(await process.StandardOutput.ReadToEndAsync());
-            sb.Append(await process.StandardError.ReadToEndAsync());
-            await process.WaitForExitAsync();
-            return sb.ToString();
+                using var process = Process.Start(startInfo);
+                if (process == null) return string.Empty;
+                return await process.StandardOutput.ReadToEndAsync();
+            }
+            catch { return "ADB error"; }
         }
     }
 }

@@ -1,8 +1,5 @@
 namespace AstralView;
 
-/// <summary>
-/// Provides paths to bundled scrcpy and adb executables.
-/// </summary>
 public static class ScrcpyPaths
 {
     private static readonly string _toolsDir = System.IO.Path.Combine(
