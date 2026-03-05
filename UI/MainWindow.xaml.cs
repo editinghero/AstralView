@@ -18,7 +18,8 @@ public sealed partial class MainWindow : Window
 
         SystemBackdrop = new MicaBackdrop();
         Title = "AstralView";
-        ExtendsContentIntoTitleBar = true;
+        // ExtendsContentIntoTitleBar = true; // Disabled for compatibility with generic builds
+
 
         var adb = new AdbService(ScrcpyPaths.AdbPath);
         _runner = new ScrcpyRunner(ScrcpyPaths.ScrcpyPath);
@@ -144,7 +145,8 @@ public sealed partial class MainWindow : Window
     private void ApplyPreset(ScrcpySettings preset)
     {
         // Video
-        VideoPanelControl.BitrateSlider.Value = preset.BitRateMbps;
+        VideoPanelControl.SetBitrate(preset.BitRateMbps);
+
 
         // Audio
         RecordToggle.IsOn = preset.Record;

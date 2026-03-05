@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace AstralView.UI;
 
-public sealed partial class CameraPanel : Page
+public sealed partial class CameraPanel : UserControl
 {
     public bool CameraEnabled { get; private set; } = false;
     public CameraFacing Facing { get; private set; } = CameraFacing.Back;

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AstralView.UI;
 
-public sealed partial class DevicePanel : Page
+public sealed partial class DevicePanel : UserControl
 {
     private readonly AdbService _adb;
     private readonly DeviceManager _deviceManager;

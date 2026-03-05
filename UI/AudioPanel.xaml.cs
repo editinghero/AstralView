@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace AstralView.UI;
 
-public sealed partial class AudioPanel : Page
+public sealed partial class AudioPanel : UserControl
 {
     public AudioSource SelectedAudioSource { get; private set; } = AudioSource.Output;
 

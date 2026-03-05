@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace AstralView.UI;
 
-public sealed partial class VideoPanel : Page
+public sealed partial class VideoPanel : UserControl
 {
     public int MaxSize { get; private set; } = 0;
     public int BitRate { get; private set; } = 8;
@@ -14,6 +14,12 @@ public sealed partial class VideoPanel : Page
     {
         this.InitializeComponent();
     }
+
+    public void SetBitrate(int mbps)
+    {
+        BitrateSlider.Value = mbps;
+    }
+
 
     private void ResolutionCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {

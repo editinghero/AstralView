@@ -31,22 +31,22 @@
                         <!-- Device Panel -->
                         <ui:DevicePanel x:Name="DevicePanelControl" />
 
-                        <NavigationViewItemSeparator />
+                        <MenuFlyoutSeparator />
 
                         <!-- Video Panel -->
                         <ui:VideoPanel x:Name="VideoPanelControl" />
 
-                        <NavigationViewItemSeparator />
+                        <MenuFlyoutSeparator />
 
                         <!-- Camera Panel -->
                         <ui:CameraPanel x:Name="CameraPanelControl" />
 
-                        <NavigationViewItemSeparator />
+                        <MenuFlyoutSeparator />
 
                         <!-- Audio Panel -->
                         <ui:AudioPanel x:Name="AudioPanelControl" />
 
-                        <NavigationViewItemSeparator />
+                        <MenuFlyoutSeparator />
 
                         <!-- Wireless Connect -->
                         <StackPanel Spacing="12">
@@ -71,7 +71,7 @@
                                        TextWrapping="Wrap" />
                         </StackPanel>
 
-                        <NavigationViewItemSeparator />
+                        <MenuFlyoutSeparator />
 
                         <!-- Presets -->
                         <StackPanel Spacing="8">
