@@ -2,6 +2,15 @@
 
 AstralView is a Windows desktop app that lets you control and mirror an Android device using scrcpy.
 
+
+## ScreenShots
+<div>
+<img width="952" height="1034" alt="Screenshot 2026-03-05 181023" src="https://github.com/user-attachments/assets/11e76fd6-d958-4d72-b6e0-eaf99574a2f1" />
+<img width="949" height="1024" alt="Screenshot 2026-03-05 181017" src="https://github.com/user-attachments/assets/6ae27a58-bd32-4f24-b3f0-d9c029816793" />
+<img width="1920" height="1034" alt="Screenshot 2026-03-05 181007" src="https://github.com/user-attachments/assets/22fe9a65-c376-4ea0-9063-2ec338bd3554" />
+
+
+</div>
 ## How to use
 
 ### Requirements
