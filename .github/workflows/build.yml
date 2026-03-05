@@ -5,6 +5,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,23 +19,21 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
-
       - name: Restore NuGet packages
-        run: dotnet restore
+        run: dotnet restore AstralView.csproj
 
-      - name: Build and Publish (Self-Contained)
-        # Using cmd /c to ensure dir works as expected, and fixed the msbuild command
-        run: msbuild AstralView.csproj /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=true /p:WindowsAppSDKSelfContained=true /p:WindowsPackageType=None /p:OutputPath=publish/
+      - name: Publish Self-Contained
+        run: dotnet publish AstralView.csproj --configuration Release --runtime win-x64 --self-contained true --output ./publish
 
-      - name: Debug - List Files
+      - name: Copy Tools to Publish Directory
         shell: cmd
-        run: dir /s publish
+        run: |
+          if not exist publish\Tools mkdir publish\Tools
+          xcopy /E /I /Y Tools publish\Tools
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: AstralView-win-x64
-          path: publish/win-x64/
+          path: publish/
           if-no-files-found: error
