@@ -39,7 +39,6 @@ public sealed partial class MainWindow : Window
         }
         catch
         {
-            // MicaBackdrop requires Windows 11, fallback to default
         }
         
         Title = "AstralView";
@@ -65,12 +64,10 @@ public sealed partial class MainWindow : Window
 
         WireCommandPreviewEvents();
         
-        // Listen to camera toggle to disable video
         CameraPanelControl.CameraToggleSwitch.Toggled += (s, e) =>
         {
             if (CameraPanelControl.CameraEnabled)
             {
-                // Default to audio off for camera (user can enable it)
                 AudioPanelControl.SetAudioEnabled(false);
             }
 
@@ -84,7 +81,6 @@ public sealed partial class MainWindow : Window
 
     private void WireCommandPreviewEvents()
     {
-        // These only affect the command preview. Do not auto-restart scrcpy.
         FullscreenCheck.Checked += (_, _) => UpdateCommandPreview();
         FullscreenCheck.Unchecked += (_, _) => UpdateCommandPreview();
         AlwaysOnTopCheck.Checked += (_, _) => UpdateCommandPreview();
@@ -219,7 +215,6 @@ public sealed partial class MainWindow : Window
         }
         catch
         {
-            // ignore
         }
     }
 
@@ -270,7 +265,6 @@ public sealed partial class MainWindow : Window
 
         try
         {
-            // Ensure any previous instance is gone to avoid camera relaunch issues
             _runner.ForceStop();
             await Task.Delay(200);
             _runner.Start(args);

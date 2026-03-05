@@ -4,6 +4,8 @@ bin/
 .vs/
 *.user
 *.suo
+*.cache
+*.tmp
 
 # NuGet
 .packages/
@@ -11,6 +13,16 @@ bin/
 
 # Build logs
 *.log
+
+# Local scripts/artifacts
+filelist.txt
+build-local.bat
+clean.bat
+install.log
+build.log
+
+# Documentation sources (not shipped)
+ref/
 
 # OS
 Thumbs.db

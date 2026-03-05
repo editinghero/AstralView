@@ -63,7 +63,7 @@ namespace AstralView.Core
             {
                 try
                 {
-                    _process.Kill(true); // Kill entire process tree
+                    _process.Kill(true);
                     _process.WaitForExit(500);
                 }
                 catch { }
@@ -74,7 +74,6 @@ namespace AstralView.Core
                 }
             }
             
-            // Also kill any orphaned scrcpy processes
             try
             {
                 foreach (var proc in Process.GetProcessesByName("scrcpy"))

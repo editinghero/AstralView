@@ -1,8 +1,5 @@
 namespace AstralView.Models
 {
-    /// <summary>
-    /// Represents an Android device detected via ADB.
-    /// </summary>
     public class Device
     {
         public string Serial { get; set; } = string.Empty;

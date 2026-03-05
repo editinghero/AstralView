@@ -25,7 +25,6 @@ public sealed partial class AudioPanel : UserControl
 
     private void AudioToggle_Toggled(object sender, RoutedEventArgs e)
     {
-        // Add safety check for InitializeComponent race conditions
         if (AudioSourceCombo == null || AudioOptions == null) return;
 
         bool isEnabled = AudioToggle.IsOn;
