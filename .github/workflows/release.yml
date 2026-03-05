@@ -1,0 +1,65 @@
+name: Release Artifacts
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: dotnet restore AstralView.csproj
+
+      - name: Build (Release, self-contained)
+        run: msbuild AstralView.csproj /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=true /p:WindowsAppSDKSelfContained=true /restore
+
+      - name: Prepare publish folder
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path publish
+          Copy-Item -Path "bin\x64\Release\net8.0-windows10.0.19041.0\win-x64\*" -Destination publish -Recurse -Force
+          if (Test-Path "Tools") {
+            New-Item -ItemType Directory -Force -Path "publish\Tools" | Out-Null
+            Copy-Item -Path "Tools\*" -Destination "publish\Tools" -Recurse -Force
+          }
+
+      - name: Create portable zip
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          $zipName = "AstralView-win-x64.zip"
+          if (Test-Path (Join-Path dist $zipName)) { Remove-Item -Force (Join-Path dist $zipName) }
+          Compress-Archive -Path "publish\*" -DestinationPath (Join-Path dist $zipName)
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup -y
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $versionNode = Select-Xml -Path "AstralView.csproj" -XPath "//Project/PropertyGroup/Version" -ErrorAction SilentlyContinue
+          $version = $null
+          if ($versionNode -and $versionNode.Node) { $version = $versionNode.Node.InnerText }
+          if ([string]::IsNullOrWhiteSpace($version)) { $version = "0.0.$env:GITHUB_RUN_NUMBER" }
+          iscc "installer\AstralView.iss" /DMyAppVersion=$version
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: AstralView-Release
+          path: dist/
+          if-no-files-found: error
