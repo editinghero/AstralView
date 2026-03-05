@@ -1,0 +1,56 @@
+<Page
+    x:Class="AstralView.UI.VideoPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Spacing="12">
+        <TextBlock Text="🎬 Video" Style="{StaticResource SubtitleTextBlockStyle}" />
+
+        <!-- Resolution -->
+        <StackPanel Spacing="4">
+            <TextBlock Text="Max Resolution" />
+            <ComboBox x:Name="ResolutionCombo" HorizontalAlignment="Stretch"
+                      SelectionChanged="ResolutionCombo_SelectionChanged">
+                <ComboBoxItem Content="No limit" Tag="0" IsSelected="True"/>
+                <ComboBoxItem Content="1080p" Tag="1080"/>
+                <ComboBoxItem Content="720p" Tag="720"/>
+                <ComboBoxItem Content="480p" Tag="480"/>
+            </ComboBox>
+        </StackPanel>
+
+        <!-- Bitrate -->
+        <StackPanel Spacing="4">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="Bitrate" />
+                <TextBlock x:Name="BitrateLabel" Grid.Column="1" Text="8 Mbps" />
+            </Grid>
+            <Slider x:Name="BitrateSlider" Minimum="1" Maximum="50" Value="8"
+                    StepFrequency="1" ValueChanged="BitrateSlider_ValueChanged" />
+        </StackPanel>
+
+        <!-- FPS -->
+        <StackPanel Spacing="4">
+            <TextBlock Text="Max FPS" />
+            <ComboBox x:Name="FpsCombo" HorizontalAlignment="Stretch"
+                      SelectionChanged="FpsCombo_SelectionChanged">
+                <ComboBoxItem Content="60 fps" Tag="60" IsSelected="True"/>
+                <ComboBoxItem Content="30 fps" Tag="30"/>
+                <ComboBoxItem Content="120 fps" Tag="120"/>
+            </ComboBox>
+        </StackPanel>
+
+        <!-- Codec -->
+        <StackPanel Spacing="4">
+            <TextBlock Text="Codec" />
+            <ComboBox x:Name="CodecCombo" HorizontalAlignment="Stretch"
+                      SelectionChanged="CodecCombo_SelectionChanged">
+                <ComboBoxItem Content="H.264" Tag="H264" IsSelected="True"/>
+                <ComboBoxItem Content="H.265" Tag="H265"/>
+                <ComboBoxItem Content="AV1" Tag="AV1"/>
+            </ComboBox>
+        </StackPanel>
+    </StackPanel>
+</Page>
