@@ -1,3 +1,5 @@
+using Microsoft.UI.Xaml;
+
 namespace AstralView;
 
 public partial class App : Application
@@ -7,7 +9,7 @@ public partial class App : Application
         this.InitializeComponent();
     }
 
-    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         m_window = new MainWindow();
         m_window.Activate();
