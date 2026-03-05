@@ -1,7 +1,7 @@
 using AstralView.Models;
 using Microsoft.UI.Xaml.Controls;
 
-namespace AstralView.UI;
+namespace AstralView;
 
 public sealed partial class CameraPanel : UserControl
 {

@@ -1,7 +1,7 @@
 using AstralView.Models;
 using Microsoft.UI.Xaml.Controls;
 
-namespace AstralView.UI;
+namespace AstralView;
 
 public sealed partial class VideoPanel : UserControl
 {
@@ -19,7 +19,6 @@ public sealed partial class VideoPanel : UserControl
     {
         BitrateSlider.Value = mbps;
     }
-
 
     private void ResolutionCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -42,6 +41,6 @@ public sealed partial class VideoPanel : UserControl
     private void CodecCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (CodecCombo.SelectedItem is ComboBoxItem item)
-            Codec = Enum.Parse<VideoCodec>(item.Tag?.ToString() ?? "H264");
+            Codec = Enum.TryParse<VideoCodec>(item.Tag?.ToString(), out var result) ? result : VideoCodec.H264;
     }
 }

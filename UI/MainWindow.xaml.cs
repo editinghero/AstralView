@@ -4,6 +4,7 @@ using AstralView.Services;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 
 namespace AstralView;
 
@@ -18,8 +19,6 @@ public sealed partial class MainWindow : Window
 
         SystemBackdrop = new MicaBackdrop();
         Title = "AstralView";
-        // ExtendsContentIntoTitleBar = true; // Disabled for compatibility with generic builds
-
 
         var adb = new AdbService(ScrcpyPaths.AdbPath);
         _runner = new ScrcpyRunner(ScrcpyPaths.ScrcpyPath);
@@ -109,7 +108,7 @@ public sealed partial class MainWindow : Window
         }
 
         WirelessStatusText.Text = "Connecting...";
-        var result = await _wirelessManager.ConnectAsync(serial, ip);
+        var result = await _wirelessManager.ConnectAsync(ip, serial); // Note: adb connect logic
         WirelessStatusText.Text = result.Trim();
     }
 
@@ -147,8 +146,7 @@ public sealed partial class MainWindow : Window
         // Video
         VideoPanelControl.SetBitrate(preset.BitRateMbps);
 
-
-        // Audio
+        // Audio/Recording
         RecordToggle.IsOn = preset.Record;
         if (!string.IsNullOrEmpty(preset.RecordFile))
             RecordFileBox.Text = preset.RecordFile;

@@ -1,11 +1,10 @@
 using AstralView.Core;
 using AstralView.Models;
 using AstralView.Services;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace AstralView.UI;
+namespace AstralView;
 
 public sealed partial class DevicePanel : UserControl
 {
@@ -45,9 +44,9 @@ public sealed partial class DevicePanel : UserControl
         RefreshButton.IsEnabled = true;
     }
 
-    private async void RefreshButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void RefreshButton_Click(object sender, RoutedEventArgs e)
     {
-        await LoadDevicesAsync();
+        _ = LoadDevicesAsync();
     }
 
     private void DeviceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
