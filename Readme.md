@@ -2,8 +2,8 @@
 
 AstralView is a Windows desktop app that lets you control and mirror an Android device using scrcpy.
 
-## Screenshots
 
+## Screenshots
 <table>
   <tr>
     <td align="center">
@@ -19,6 +19,8 @@ AstralView is a Windows desktop app that lets you control and mirror an Android 
     </td>
   </tr>
 </table>
+
+
 ## How to use
 
 ### Requirements
@@ -58,8 +60,9 @@ AstralView is a Windows desktop app that lets you control and mirror an Android 
 You can use the **Device Actions** buttons while scrcpy is running:
 
 - Turn Screen Off / On
-- Show Touches / Hide Touches
-- Stay Awake / Disable Stay Awake
+- Rotate Left / Rotate Right
+- Show Touches
+- Stay Awake
 
 ## Notes
 
