@@ -25,10 +25,11 @@ jobs:
         run: dotnet restore
 
       - name: Build and Publish (Self-Contained)
-        # Using msbuild to ensure WindowsAppSDKSelfContained is respected
+        # Using cmd /c to ensure dir works as expected, and fixed the msbuild command
         run: msbuild AstralView.csproj /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=true /p:WindowsAppSDKSelfContained=true /p:WindowsPackageType=None /p:OutputPath=publish/
 
       - name: Debug - List Files
+        shell: cmd
         run: dir /s publish
 
       - name: Upload build artifact

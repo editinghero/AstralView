@@ -15,9 +15,11 @@ public sealed partial class AudioPanel : UserControl
 
     private void AudioToggle_Toggled(object sender, RoutedEventArgs e)
     {
+        // Add safety check for InitializeComponent race conditions
+        if (AudioSourceCombo == null || AudioOptions == null) return;
+
         bool isEnabled = AudioToggle.IsOn;
         
-        // Manually toggle controls
         AudioSourceCombo.IsEnabled = isEnabled;
         AudioOptions.Opacity = isEnabled ? 1.0 : 0.5;
 
@@ -34,6 +36,8 @@ public sealed partial class AudioPanel : UserControl
 
     private void UpdateAudioSource()
     {
+        if (AudioSourceCombo == null) return;
+
         SelectedAudioSource = AudioSourceCombo.SelectedIndex == 1
             ? AudioSource.Mic
             : AudioSource.Output;
