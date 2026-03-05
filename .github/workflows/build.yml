@@ -26,7 +26,7 @@ jobs:
         run: dotnet restore AstralView.csproj
 
       - name: Build with MSBuild
-        run: msbuild AstralView.csproj /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=true /restore
+        run: msbuild AstralView.csproj /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=true /p:WindowsAppSDKSelfContained=true /restore
 
       - name: Copy output to publish folder
         shell: pwsh
