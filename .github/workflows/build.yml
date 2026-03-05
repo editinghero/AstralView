@@ -19,11 +19,20 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
       - name: Restore NuGet packages
         run: dotnet restore AstralView.csproj
 
-      - name: Publish Self-Contained
-        run: dotnet publish AstralView.csproj --configuration Release --runtime win-x64 --self-contained true --output ./publish
+      - name: Build with MSBuild
+        run: msbuild AstralView.csproj /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:SelfContained=true /restore
+
+      - name: Copy output to publish folder
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path publish
+          Copy-Item -Path "bin\x64\Release\net8.0-windows10.0.19041.0\win-x64\*" -Destination publish -Recurse -Force
 
       - name: Copy Tools to Publish Directory
         shell: cmd
