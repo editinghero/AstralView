@@ -401,12 +401,38 @@ public sealed partial class MainWindow : Window
         StatusBarText.Text = "Show touches enabled";
     }
 
+    private async void HideTouches_Click(object sender, RoutedEventArgs e)
+    {
+        var serial = DevicePanelControl.SelectedDevice?.Serial;
+        if (string.IsNullOrEmpty(serial)) return;
+
+        await _adb.ExecuteCommandAsync($"-s {serial} shell settings put system show_touches 0");
+        StatusBarText.Text = "Show touches disabled";
+    }
+
     private async void StayAwake_Click(object sender, RoutedEventArgs e)
     {
         var serial = DevicePanelControl.SelectedDevice?.Serial;
         if (string.IsNullOrEmpty(serial)) return;
-        
-        await _adb.ExecuteCommandAsync($"-s {serial} shell settings put global stay_on_while_plugged_in 7");
+
+        var result = await _adb.ExecuteCommandAsync($"-s {serial} shell svc power stayon true");
+        if (result.Contains("error", StringComparison.OrdinalIgnoreCase))
+        {
+            await _adb.ExecuteCommandAsync($"-s {serial} shell settings put global stay_on_while_plugged_in 7");
+        }
         StatusBarText.Text = "Stay awake enabled";
+    }
+
+    private async void DisableStayAwake_Click(object sender, RoutedEventArgs e)
+    {
+        var serial = DevicePanelControl.SelectedDevice?.Serial;
+        if (string.IsNullOrEmpty(serial)) return;
+
+        var result = await _adb.ExecuteCommandAsync($"-s {serial} shell svc power stayon false");
+        if (result.Contains("error", StringComparison.OrdinalIgnoreCase))
+        {
+            await _adb.ExecuteCommandAsync($"-s {serial} shell settings put global stay_on_while_plugged_in 0");
+        }
+        StatusBarText.Text = "Stay awake disabled";
     }
 }
