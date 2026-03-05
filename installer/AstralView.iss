@@ -8,7 +8,7 @@
 #endif
 
 [Setup]
-AppId={2E6F7F4D-3D0B-4B2D-9A2A-7F7B6A6A5D7F}
+AppId={{2E6F7F4D-3D0B-4B2D-9A2A-7F7B6A6A5D7F}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
