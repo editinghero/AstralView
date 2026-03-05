@@ -50,6 +50,11 @@ namespace AstralView.Services
             return await RunCommandAsync($"disconnect {ip}:5555");
         }
 
+        public async Task<string> ExecuteCommandAsync(string args)
+        {
+            return await RunCommandAsync(args);
+        }
+
         private async Task<string> RunCommandAsync(string args)
         {
             try

@@ -41,7 +41,7 @@ public sealed partial class MainWindow : Window
         DevicePanelControl.Initialize(_adb, _deviceManager);
         
         // Listen to camera toggle to disable video
-        CameraPanelControl.CameraToggle.Toggled += (s, e) =>
+        CameraPanelControl.CameraToggleSwitch.Toggled += (s, e) =>
         {
             VideoPanelControl.VideoOptions.IsEnabled = !CameraPanelControl.CameraEnabled;
             VideoPanelControl.VideoOptions.Opacity = CameraPanelControl.CameraEnabled ? 0.5 : 1.0;

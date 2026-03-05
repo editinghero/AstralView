@@ -11,6 +11,8 @@ public sealed partial class CameraPanel : UserControl
     public string CameraSize { get; private set; } = "1920x1080";
     public string CameraId { get; private set; } = string.Empty;
     public bool TurnScreenOff { get; private set; } = false;
+    
+    public ToggleSwitch CameraToggleSwitch => CameraToggle;
 
     public CameraPanel()
     {
