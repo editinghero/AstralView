@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackPanel x:Name="VideoOptions" Spacing="12">
+    <StackPanel x:Name="VideoOptions" x:FieldModifier="public" Spacing="12">
         <TextBlock Text="Video" Style="{StaticResource SubtitleTextBlockStyle}" />
 
         <StackPanel Spacing="4">
