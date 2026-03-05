@@ -84,6 +84,10 @@
                             <TextBlock Text="Device Actions" Style="{StaticResource SubtitleTextBlockStyle}" />
                             <Button Content="Turn Screen Off" HorizontalAlignment="Stretch" Click="TurnScreenOff_Click" />
                             <Button Content="Turn Screen On" HorizontalAlignment="Stretch" Click="TurnScreenOn_Click" />
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                <Button Grid.Column="0" Content="Rotate Left" HorizontalAlignment="Stretch" Click="RotateLeft_Click" />
+                                <Button Grid.Column="1" Content="Rotate Right" HorizontalAlignment="Stretch" Click="RotateRight_Click" />
+                            </Grid>
                             <Button Content="Show Touches" HorizontalAlignment="Stretch" Click="ShowTouches_Click" />
                             <Button Content="Stay Awake" HorizontalAlignment="Stretch" Click="StayAwake_Click" />
                         </StackPanel>

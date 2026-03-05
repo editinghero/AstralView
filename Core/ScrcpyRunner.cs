@@ -7,6 +7,8 @@ namespace AstralView.Core
         private Process? _process;
         private readonly string _scrcpyPath;
 
+        public event EventHandler? Exited;
+
         public bool IsRunning => _process != null && !_process.HasExited;
 
         public ScrcpyRunner(string scrcpyPath)
@@ -27,6 +29,24 @@ namespace AstralView.Core
             };
 
             _process = Process.Start(startInfo);
+            if (_process != null)
+            {
+                _process.EnableRaisingEvents = true;
+                _process.Exited += (_, _) =>
+                {
+                    try
+                    {
+                        _process?.Dispose();
+                    }
+                    catch { }
+                    finally
+                    {
+                        _process = null;
+                    }
+
+                    Exited?.Invoke(this, EventArgs.Empty);
+                };
+            }
         }
 
         public void Stop()

@@ -21,6 +21,9 @@ public sealed partial class MainWindow : Window
     private CancellationTokenSource? _restartCts;
     private bool _restartInProgress;
 
+    private bool _isUpdatingCommandPreview;
+    private bool _customCommandActive;
+
     private readonly ScrcpyRunner _runner;
     private readonly WirelessManager _wirelessManager;
     private readonly AdbService _adb;
@@ -48,6 +51,14 @@ public sealed partial class MainWindow : Window
         _wirelessManager = new WirelessManager(_adb);
         _deviceManager = new DeviceManager(_adb);
 
+        _runner.Exited += (_, _) => DispatcherQueue.TryEnqueue(() =>
+        {
+            _restartCts?.Cancel();
+            StatusBarText.Text = "scrcpy closed";
+            StartButton.IsEnabled = true;
+            StopButton.IsEnabled = false;
+        });
+
         DevicePanelControl.Initialize(_adb, _deviceManager);
 
         ShortcutsListView.ItemsSource = GetDefaultShortcuts();
@@ -73,13 +84,16 @@ public sealed partial class MainWindow : Window
 
     private void WireCommandPreviewEvents()
     {
-        FullscreenCheck.Checked += (_, _) => OnSettingsChanged();
-        FullscreenCheck.Unchecked += (_, _) => OnSettingsChanged();
-        AlwaysOnTopCheck.Checked += (_, _) => OnSettingsChanged();
-        AlwaysOnTopCheck.Unchecked += (_, _) => OnSettingsChanged();
+        // These only affect the command preview. Do not auto-restart scrcpy.
+        FullscreenCheck.Checked += (_, _) => UpdateCommandPreview();
+        FullscreenCheck.Unchecked += (_, _) => UpdateCommandPreview();
+        AlwaysOnTopCheck.Checked += (_, _) => UpdateCommandPreview();
+        AlwaysOnTopCheck.Unchecked += (_, _) => UpdateCommandPreview();
 
         RecordToggle.Toggled += (_, _) => OnSettingsChanged();
         RecordFileBox.TextChanged += (_, _) => OnSettingsChanged();
+
+        CommandPreviewText.TextChanged += (_, _) => OnCommandPreviewEdited();
 
         IpAddressBox.TextChanged += (_, _) => { };
         PortBox.TextChanged += (_, _) => { };
@@ -92,6 +106,16 @@ public sealed partial class MainWindow : Window
     private void OnSettingsChanged()
     {
         UpdateCommandPreview();
+
+        if (!_runner.IsRunning) return;
+        _ = RestartScrcpyDebouncedAsync();
+    }
+
+    private void OnCommandPreviewEdited()
+    {
+        if (_isUpdatingCommandPreview) return;
+
+        _customCommandActive = true;
 
         if (!_runner.IsRunning) return;
         _ = RestartScrcpyDebouncedAsync();
@@ -201,10 +225,21 @@ public sealed partial class MainWindow : Window
 
     private void UpdateCommandPreview()
     {
+        if (_customCommandActive) return;
+
         var settings = BuildSettings();
         var builder = new ScrcpyCommandBuilder(settings);
         var args = builder.Build();
-        CommandPreviewText.Text = $"scrcpy {args}";
+
+        try
+        {
+            _isUpdatingCommandPreview = true;
+            CommandPreviewText.Text = $"scrcpy {args}";
+        }
+        finally
+        {
+            _isUpdatingCommandPreview = false;
+        }
     }
 
     private ScrcpySettings BuildSettings()
@@ -329,6 +364,24 @@ public sealed partial class MainWindow : Window
         
         await _adb.ExecuteCommandAsync($"-s {serial} shell input keyevent 26");
         StatusBarText.Text = "Screen turned on";
+    }
+
+    private async void RotateLeft_Click(object sender, RoutedEventArgs e)
+    {
+        var serial = DevicePanelControl.SelectedDevice?.Serial;
+        if (string.IsNullOrEmpty(serial)) return;
+
+        await _adb.ExecuteCommandAsync($"-s {serial} shell settings put system user_rotation 3");
+        StatusBarText.Text = "Rotated left";
+    }
+
+    private async void RotateRight_Click(object sender, RoutedEventArgs e)
+    {
+        var serial = DevicePanelControl.SelectedDevice?.Serial;
+        if (string.IsNullOrEmpty(serial)) return;
+
+        await _adb.ExecuteCommandAsync($"-s {serial} shell settings put system user_rotation 1");
+        StatusBarText.Text = "Rotated right";
     }
 
     private async void ShowTouches_Click(object sender, RoutedEventArgs e)
